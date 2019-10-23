@@ -14,6 +14,8 @@
 
 (require 'org)
 (org-babel-load-file "~/.emacs.d/toby.org")
+;; When you eventually need this, check out this article:
+;; https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources
 ;; (org-babel-load-file "~/.emacs.d/secrets.org")
 
 ;; Keep emacs Custom-settings in separate file

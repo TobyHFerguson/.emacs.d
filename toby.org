@@ -3,6 +3,9 @@
 
 * Introduction
   This is my version of Tasshin Fogelman's Emacs configuration.
+
+* Laptop Setup
+Ensure you've setup as per https://bitbucket.org/TobyHFerguson/org/src/master/mac_setup.org
 * Settings
 ** Personal information
 #+BEGIN_SRC emacs-lisp
@@ -974,6 +977,10 @@ I learned about save place from [[http://whattheemacsd.com/init.el-03.html][Magn
 
   (save-place-mode 1)
 #+END_SRC
+*** [[https://github.com/rejeep/f.el][GitHub - rejeep/f.el: Modern API for working with files and directories in Emacs]]
+#+BEGIN_SRC emacs-lisp
+(use-package f)
+#+END_SRC
 ** Regular Expressions
 Regexes are great. Not everyone knows them, and most user interfaces don't expose them, but I think most people who use computers could use them. Luckily, Emacs is great about this. It's easier to use them if you have good tools for noticing if your regular expressions match input.
 *** Build Regexes
@@ -1419,7 +1426,8 @@ I use the [[http://orgmode.org/manual/Tracking-your-habits.html][org-habits]] mo
     (interactive)
     (org-set-property "STYLE" "habit"))
 #+END_SRC
-**** org-gcal
+**** [[https://github.com/myuhe/org-gcal.el][org-gcal]]
+See also: [[https://cestlaz.github.io/posts/using-emacs-26-gcal/][Using Emacs - 26 - Google Calendar, Org Agenda]]
 #+BEGIN_SRC emacs-lisp
   (use-package org-gcal
     :bind (:map org-agenda-mode-map
