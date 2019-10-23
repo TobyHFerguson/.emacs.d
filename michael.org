@@ -572,12 +572,8 @@ Over time, I've come to prefer Eshell over shell mode or Ansi-term. The main fea
       (interactive)
       (eshell 'true))
 
-    (use-package company-eshell-autosuggest
-      :init
-      (defun setup-company-eshell-autosuggest ()
-        (with-eval-after-load 'company
-          (setq-local company-backends '(company-eshell-autosuggest))
-          (setq-local company-frontends '(company-preview-frontend))))))
+    (use-package esh-autosuggest
+      :hook (eshell-mode . esh-autosuggest-mode)))
 #+END_SRC
 *** Shell Mode
 #+BEGIN_SRC emacs-lisp
@@ -1463,10 +1459,7 @@ Flycheck presents a handsome and usable interface for [[http://endlessparenthese
     :init
     (use-package flycheck-clojure)
     (global-flycheck-mode)
-    (setq flycheck-indication-mode 'right-fringe)
-    :config
-    (flycheck-clojure-setup)
-    (require 'flycheck-joker))
+    (setq flycheck-indication-mode 'right-fringe))
 #+END_SRC
 *** REST Exploring (Restclient)
 See Magnars' tutorial on [[http://emacsrocks.com/e15.html][Emacs Rocks]].
@@ -1935,6 +1928,7 @@ I wanted to be able to add a sort property to files or subtrees and get automati
   (setq org-agenda-files (quote ("~/org/todo.org"
                                  "~/org/agendas.org"
                                  "~/org/inbox.org"
+                                 "~/org/waiting.org"
                                  "~/org/calendar/gcal.org"
                                  "~/org/calendar/maple.org"
                                  "~/org/somedaymaybe.org")))
@@ -2030,6 +2024,11 @@ Thanks Sacha for this custom code!
       (fetch-calendar)
       (org-agenda-list 'file (org-read-date nil nil "-14d") 28)
       (beginend-org-agenda-mode-goto-beginning)))
+#+END_SRC
+****** Delegated and Waiting Tasks
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-agenda-custom-commands
+               '("w" "WAITING" todo "WAITING" ((org-agenda-overriding-header "Delegated and/or Waiting"))) t)
 #+END_SRC
 ***** Auto Advance
 #+BEGIN_SRC emacs-lisp
