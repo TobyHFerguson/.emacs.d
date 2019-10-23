@@ -1721,7 +1721,7 @@ Thanks Sacha for this custom code!
     (interactive)
     (let ((org-agenda-start-with-log-mode t)
           (org-agenda-use-time-grid nil)
-          (org-agenda-files '("~/org/calendar/gcal.org" "~/org/calendar/maple.org")))
+          (org-agenda-files '("~/org/calendar.org")))
       (fetch-calendar)
       (org-agenda-list nil (org-read-date nil nil "-2d") 4)
       (beginend-org-agenda-mode-goto-beginning)))
@@ -1730,7 +1730,7 @@ Thanks Sacha for this custom code!
     (interactive)
     (let ((org-agenda-start-with-log-mode t)
           (org-agenda-use-time-grid nil)
-          (org-agenda-files '("~/org/calendar/gcal.org" "~/org/calendar/maple.org")))
+          (org-agenda-files '("~/org/calendar.org")))
       (fetch-calendar)
       (org-agenda-list 'file (org-read-date nil nil "-14d") 28)
       (beginend-org-agenda-mode-goto-beginning)))
@@ -1773,7 +1773,7 @@ The first Emacs Lisp that I ever wrote was to configure my capture templates!
 
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+heading "inbox.org" "Inbox")
+        '(("t" "Todo" entry (file+headline "inbox.org" "Inbox")
            "* TODO %?:inbox:\nEntered on %U\n  %i\n  %a")
           ("T" "Tickler" entry
            (file+headline "tickler.org" "Tickler")
