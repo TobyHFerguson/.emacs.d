@@ -1143,11 +1143,12 @@ This code from [[http://whattheemacsd.com/setup-magit.el-01.html][Magnars]] open
            ("RET" . magit-checkout))
     :config
     (add-hook 'after-save-hook 'magit-after-save-refresh-status)
-    (setq magit-use-overlays nil
-          magit-section-visibility-indicator nil
-          magit-completing-read-function 'ivy-completing-read
-          magit-push-always-verify nil
-          magit-repository-directories '("~/src/"))
+    ;; (setq magit-use-overlays nil
+    ;;       magit-section-visibility-indicator nil
+    ;;       magit-completing-read-function 'ivy-completing-read
+    ;;       magit-push-always-verify nil
+    ;;       magit-repository-directories (list (cons "~/src/" 3))
+    ;;       )
     (use-package git-timemachine
       :bind (("C-x v t" . git-timemachine)))
     (use-package git-link
@@ -1760,7 +1761,7 @@ However, there are a *lot* of commands for clocking; this is a perfect instance 
              :map org-agenda-mode-map
              ("C-c w" . hydra-org-agenda-clock/body))
 #+END_SRC
-**** Drag and Drop
+**** [[https://github.com/abo-abo/org-download][Drag and Drop]] images 
 #+BEGIN_SRC emacs-lisp
 (use-package org-download)
 #+END_SRC
@@ -1935,7 +1936,7 @@ Speed commands are really useful, but I often want to make use of them when I'm 
 Add structure templates for editing Emacs Lisp and encrypting an org-mode file.
 
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'org-structure-template-alist '("g" "# -*- mode:org; epa-file-encrypt-to: (\"michaelwfogleman@gmail.com\") -*-"))
+  (add-to-list 'org-structure-template-alist '("g" "# -*- mode:org; epa-file-encrypt-to: (\"toby.h.ferguson@gmail.com\") -*-"))
   (add-to-list 'org-structure-template-alist '("l" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC" "<src lang=\"emacs-lisp\">\n?\n</src>"))
 #+END_SRC
 **** Tagging
@@ -2000,4 +2001,311 @@ From an appendix in Intro to Emacs Lisp.
 
   ;; Bind 'the-the' to  C-c \
   (bind-key "C-c \\" 'the-the)
+#+END_SRC
+** Markdown
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode)
+#+END_SRC
+
+** [[https://github.com/alezost/shift-number.el][Shift Numbers at Point]]
+#+BEGIN_SRC emacs-lisp
+(use-package shift-number
+  :bind (("M-+" . shift-number-up)
+         ("M-_" . shift-number-down)))
+#+END_SRC
+** Spell Checking (Flyspell)
+Requires that you've already install =aspell=:
+#+BEGIN_SRC sh result: silent
+brew install aspell
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package flyspell
+    :bind (("C-`" . ispell-word)
+           ("C-~" . ispell-buffer))
+    :init
+    (dolist (hook '(text-mode-hook org-mode-hook))
+      (add-hook hook (lambda () (flyspell-mode 1))))
+    :config
+    (setq ispell-program-name "aspell"
+          ispell-list-command "--list"))
+#+END_SRC
+** Document Conversions ([[http://joostkremers.github.io/pandoc-mode/][Pandoc]])
+Hit =C-c /= to run =pandoc-main-hydra/body=, the main entry point for =pandoc-mode=.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package pandoc-mode
+    :init
+    (add-hook 'pandoc-mode-hook 'pandoc-load-default-settings)
+    :config
+    (when (is-mac-p)
+      (add-to-list 'exec-path "/usr/local/texlive/2016basic/bin/universal-darwin")))
+#+END_SRC
+
+** [[https://elpa.gnu.org/packages/csv-mode.html][CSV]]
+#+BEGIN_SRC emacs-lisp
+  (use-package csv-mode
+    :mode ("\\.csv$" . csv-mode))
+#+END_SRC
+** [[https://github.com/wasamasa/nov.el][Epubs]]
+#+BEGIN_SRC emacs-lisp
+  (defun copy-whole-buffer ()
+    (interactive)
+    (copy-region-as-kill (point-min) (point-max)))
+
+  (use-package nov
+    :bind (:map nov-mode-map
+                ("c" . copy-whole-buffer))
+    :init
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+#+END_SRC
+* Organization (GTD and PARA)
+** Projects
+A project is "any outcome that will take more than one action step to complete." As a result of implementing Tiago Forte's "PARA" system, I can ensure that I always have an up to date project list.
+
+#+BEGIN_SRC emacs-lisp
+  (defun go-to-projects ()
+    (interactive)
+    (find-file "~/org/projects.org")
+    (widen)
+    (beginning-of-buffer)
+    (re-search-forward "* Projects")
+    (beginning-of-line))
+
+  (defun project-overview ()
+    (interactive)
+    (go-to-projects)
+    (org-narrow-to-subtree)
+    (org-sort-entries t ?p)
+    (org-columns))
+
+  (defun project-deadline-overview ()
+    (interactive)
+    (go-to-projects)
+    (org-narrow-to-subtree)
+    (org-sort-entries t ?d)
+    (org-columns))
+#+END_SRC
+
+The concept of Stuck Projects comes from David Allen's GTD. A stuck project is a project without any action steps or tasks associated with it.
+
+Org-Mode has the ability to tell you which subtrees don't have tasks associated with them. You can also configure what it recognizes as a stuck project. Unfortunately, by default, this functionality picks up a lot of noise.
+
+This function creates an agenda of stuck projects that is restricted to my "Projects" subtree.
+#+BEGIN_SRC emacs-lisp
+  (defun my-org-agenda-list-stuck-projects ()
+    (interactive)
+    (go-to-projects)
+    (org-agenda nil "#" 'subtree))
+#+END_SRC
+** Areas
+#+BEGIN_SRC emacs-lisp
+  (defun go-to-areas ()
+      (interactive)
+      (find-file "~/org/todo.org")
+      (widen)
+      (beginning-of-buffer)
+      (re-search-forward "* Areas")
+      (beginning-of-line))
+
+  (defun areas-overview ()
+      (interactive)
+      (go-to-areas)
+      (org-narrow-to-subtree)
+      (org-columns))
+#+END_SRC
+** Reviews
+#+BEGIN_SRC emacs-lisp
+  (defun my-new-daily-review ()
+    (interactive)
+    (let ((org-capture-templates '(("d" "Review: Daily Review" entry (file+olp+datetree "/tmp/reviews.org")
+                                    (file "~/org/templates/dailyreviewtemplate.org")))))
+      (progn
+        (org-capture nil "d")
+        (org-capture-finalize t)
+        (org-speed-move-safe 'outline-up-heading)
+        (org-narrow-to-subtree)
+        (fetch-calendar)
+        (org-clock-in))))
+
+  (defun my-new-weekly-review ()
+    (interactive)
+    (let ((org-capture-templates '(("w" "Review: Weekly Review" entry (file+olp+datetree "/tmp/reviews.org")
+                                    (file "~/org/templates/weeklyreviewtemplate.org")))))
+      (progn
+        (org-capture nil "w")
+        (org-capture-finalize t)
+        (org-speed-move-safe 'outline-up-heading)
+        (org-narrow-to-subtree)
+        (fetch-calendar)
+        (org-clock-in))))
+
+  (defun my-new-monthly-review ()
+    (interactive)
+    (let ((org-capture-templates '(("m" "Review: Monthly Review" entry (file+olp+datetree "/tmp/reviews.org")
+                                    (file "~/org/templates/monthlyreviewtemplate.org")))))
+      (progn
+        (org-capture nil "m")
+        (org-capture-finalize t)
+        (org-speed-move-safe 'outline-up-heading)
+        (org-narrow-to-subtree)
+        (fetch-calendar)
+        (org-clock-in))))
+
+  (bind-keys :prefix-map review-map
+             :prefix "C-c r"
+             ("d" . my-new-daily-review)
+             ("w" . my-new-weekly-review)
+             ("m" . my-new-monthly-review))
+
+  (f-touch "/tmp/reviews.org")
+#+END_SRC
+* Functions
+** Emacs Configuration File
+This function and the corresponding keybinding allows me to rapidly access my configuration. They are adapted from Bozhidar Batsov's [[http://emacsredux.com/blog/2013/05/18/instant-access-to-init-dot-el/][post on Emacs Redux]].
+
+I use mwf-init-file rather than user-init-file, because I edit the config file in a Git repo.
+
+#+BEGIN_SRC emacs-lisp
+  (defun find-init-file ()
+    "Edit my init file in another window."
+    (interactive)
+    (let ((mwf-init-file "~/src/.emacs.d/toby.org"))
+      (find-file mwf-init-file)))
+
+  (bind-key "C-c I" 'find-init-file)
+#+END_SRC
+
+Relatedly, I often want to reload my init-file. This will actually use the system-wide user-init-file variable.
+
+#+BEGIN_SRC emacs-lisp
+  (defun reload-init-file ()
+    "Reload my init file."
+    (interactive)
+    (load-file user-init-file))
+
+  (bind-key "C-c M-l" 'reload-init-file)
+#+END_SRC
+** Buffer Management
+*** Kill This Buffer
+#+BEGIN_SRC emacs-lisp
+  (defun kill-this-buffer ()
+    (interactive)
+    (kill-buffer (current-buffer)))
+
+  (bind-key "C-x C-k" 'kill-this-buffer)
+#+END_SRC
+
+By default, pressing 'q' in Dired, the packages menu, or Elfeed runs quit-window, which quits the window and buries its buffer. I'd prefer the buffer to close.
+
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map dired-mode-map
+             ("q" . kill-this-buffer))
+
+  (bind-keys :map package-menu-mode-map
+             ("q" . kill-this-buffer))
+#+END_SRC
+*** Kill All Other Buffers
+#+BEGIN_SRC emacs-lisp
+  (defun kill-other-buffers ()
+     "Kill all other buffers."
+     (interactive)
+     (mapc 'kill-buffer (delq (current-buffer) (buffer-list))))
+#+END_SRC
+*** Minibuffer
+This code comes from [[http://www.emacswiki.org/emacs/MiniBuffer][EmacsWiki]].
+
+#+BEGIN_SRC emacs-lisp
+  (defun switch-to-minibuffer ()
+    "Switch to minibuffer window."
+    (interactive)
+    (if (active-minibuffer-window)
+        (select-window (active-minibuffer-window))
+      (error "Minibuffer is not active")))
+
+  (bind-key "M-m" 'switch-to-minibuffer)
+#+END_SRC
+** Edit as Root
+This tip comes from an [[http://emacs-fu.blogspot.kr/2013/03/editing-with-root-privileges-once-more.html][emacs-fu blog post]].
+
+#+BEGIN_SRC emacs-lisp
+  (defun find-file-as-root ()
+    "Like `ido-find-file, but automatically edit the file with
+  root-privileges (using tramp/sudo), if the file is not writable by
+  user."
+    (interactive)
+    (let ((file (ido-read-file-name "Edit as root: ")))
+      (unless (file-writable-p file)
+        (setq file (concat "/sudo:root@localhost:" file)))
+      (find-file file)))
+
+  (bind-key "C-x F" 'find-file-as-root)
+#+END_SRC
+** Unfill Paragraph
+This function borrowed from Sacha.
+
+#+BEGIN_SRC emacs-lisp
+  (defun unfill-paragraph (&optional region)
+    "Takes a multi-line paragraph and makes it into a single line of text."
+    (interactive (progn
+                   (barf-if-buffer-read-only)
+                   (list t)))
+    (let ((fill-column (point-max)))
+      (fill-paragraph nil region)))
+
+  (bind-key "M-Q" 'unfill-paragraph)
+#+END_SRC
+** Move Lines
+Via [[https://github.com/hrs/dotfiles][Harry Schwartz]].
+
+#+BEGIN_SRC emacs-lisp
+  (defun move-line-up ()
+    (interactive)
+    (transpose-lines 1)
+    (forward-line -2))
+
+  (defun move-line-down ()
+    (interactive)
+    (forward-line 1)
+    (transpose-lines 1)
+    (forward-line -1))
+
+  (bind-keys ("M-<up>" . move-line-up)
+             ("M-<down>" . move-line-down))
+#+END_SRC
+** Flush Empty Lines
+#+BEGIN_SRC emacs-lisp
+  (defun flush-empty-lines ()
+    (interactive)
+    (flush-lines "^$"))
+#+END_SRC
+** Processing imported notes
+#+BEGIN_SRC emacs-lisp
+  (defun add-newlines-between-paragraphs ()
+    (interactive)
+    (save-excursion
+      (beginning-of-buffer)
+      (while (< (point) (point-max))
+        (move-end-of-line nil)
+        (newline)
+        (next-line))))
+
+  (defun clean-instapaper-evernote-notes ()
+    "Cleans notes exported from Instapaper into Evernote. Copies processed buffer to clipboard."
+    (interactive)
+    (beginning-of-buffer)
+    (replace-regexp "^\“" "")
+    (beginning-of-buffer)
+    (replace-regexp "\”$" "")
+    (beginning-of-buffer)
+    (add-newlines-between-paragraphs)
+    (copy-whole-buffer))
+
+  (defun clean-liner-evernote-notes ()
+    "Cleans notes exported from Liner into Evernote. Copies processed buffer to clipboard."
+    (interactive)
+    (beginning-of-buffer)
+    (replace-regexp "Source \:" "Source:")
+    (beginning-of-buffer)
+    (replace-regexp "^- " "")
+    (copy-whole-buffer))
 #+END_SRC
