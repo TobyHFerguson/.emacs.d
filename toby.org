@@ -92,7 +92,11 @@ I got this suggestion from https://github.com/nashamri/spacemacs-theme/issues/42
       :ensure spacemacs-theme
       :config (load-theme 'spacemacs-light t))
 #+END_SRC
-   
+**** Start initial frame maximized
+From [[https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up][here]]
+#+begin_src emacs-lisp
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+#+end_src
 *** Font
 Install the font first, using brew:
 #+BEGIN_SRC sh
