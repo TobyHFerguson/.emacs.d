@@ -13,8 +13,8 @@
 (setq package-enable-at-startup nil)
 
 (require 'org)
-(org-babel-load-file "~/.emacs.d/michael.org")
-(org-babel-load-file "~/.emacs.d/secrets.org")
+(org-babel-load-file "~/.emacs.d/toby.org")
+;; (org-babel-load-file "~/.emacs.d/secrets.org")
 
 ;; Keep emacs Custom-settings in separate file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
