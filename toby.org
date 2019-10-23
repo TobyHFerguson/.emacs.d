@@ -82,6 +82,32 @@ I got this suggestion from https://github.com/nashamri/spacemacs-theme/issues/42
   (set-face-attribute 'default nil :height 150)
 #+END_SRC
 
+*** Fringe decorations
+
+   [[http://www.emacswiki.org/emacs/TheFringe][The fringe]] is the vertical region at the right and left of the
+   buffer. Emacs lets you customize it of course.
+
+   Here I set up git diffs and buffer position in the fringe.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package git-gutter
+       :init (global-git-gutter-mode +1)
+       :config 
+       (setq-default indicate-buffer-boundaries 'left)
+       (setq-default indicate-empty-lines +1))
+   #+END_SRC
+*** Buffer names
+   Setup uniquify so that non-unique buffer names get the parent path
+   included to make them unique.
+   #+NAME: look-and-feel
+   #+BEGIN_SRC emacs-lisp
+     (use-package uniquify
+       :ensure nil				;See
+                                             ;https://github.com/jwiegley/use-package/issues/320
+                                             ;for explanation
+       :config
+       (setq uniquify-buffer-name-style 'forward))
+   #+END_SRC
 *** Prettify Symbols
     Make symbols (such as =lambda=) actually show up as the relevant symbol
 #+BEGIN_SRC emacs-lisp
@@ -1665,6 +1691,24 @@ Thanks Sacha for this custom code!
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-agenda-custom-commands
                '("w" "WAITING" todo "WAITING" ((org-agenda-overriding-header "Delegated and/or Waiting"))) t)
+#+END_SRC
+****** Inbox
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-agenda-custom-commands
+               '("i" "inbox" tags ".*"
+                ((org-agenda-files (list (expand-file-name "inbox.org" org-directory))))))
+#+END_SRC
+****** Work
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-agenda-custom-commands
+               '("w" "At work"
+                ((agenda)
+                 (tags-todo "@Work" ((org-agenda-overriding-header "Work"))))))
+#+END_SRC
+****** Emacs
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-agenda-custom-commands
+               '("e" "Emacs" ((tags "Emacs"))))
 #+END_SRC
 ***** Auto Advance
 #+BEGIN_SRC emacs-lisp
