@@ -1447,7 +1447,7 @@ brew tap homebrew/cask-fonts && brew cask install font-et-book
     :init
     (setq default-major-mode 'org-mode
           org-directory "~/org/"
-          org-log-done t
+          org-log-done note
           org-startup-indented t
           org-startup-truncated nil
           org-startup-with-inline-images t
