@@ -285,11 +285,22 @@ Also, unbind downcase region, which has plagued my documents for eons.
 From Artur's article, "[[http://endlessparentheses.com/faster-pop-to-mark-command.html][Faster Pop to Mark Command]]."
 
 #+BEGIN_SRC emacs-lisp
-  (defadvice pop-to-mark-command (around ensure-new-position activate)
+  ;; Old way of doing things
+  ;; (defadvice pop-to-mark-command (around ensure-new-position activate)
+  ;;   (let ((p (point)))
+  ;;     (dotimes (i 10)
+  ;;       (when (= p (point)) ad-do-it))))
+
+  ;; New way using advice-add
+  (defun modi/multi-pop-to-mark (orig-fun &rest args)
+    "Call ORIG-FUN until the cursor moves.
+  Try the repeated popping up to 10 times."
     (let ((p (point)))
       (dotimes (i 10)
-        (when (= p (point)) ad-do-it))))
-
+        (when (= p (point))
+          (apply orig-fun args)))))
+  (advice-add 'pop-to-mark-command :around
+              #'modi/multi-pop-to-mark)
   (setq set-mark-command-repeat-pop t)
 #+END_SRC
 *** Encoding
@@ -837,6 +848,10 @@ Recent files keeps track of which files you're using; I access it by rebinding f
     :init
     (setq flx-ido-threshold 1000)
     (flx-ido-mode 1))
+
+  (use-package ido-complete-space-or-hyphen
+    :init
+    (ido-mode t))
 #+END_SRC
 **** Smex
 Smex (Smart M-X) implements IDO functionality for the M-X window.
@@ -852,6 +867,8 @@ Smex (Smart M-X) implements IDO functionality for the M-X window.
 *** Company Mode
 Configurations via [[https://oremacs.com/2017/12/27/company-numbers/][Using digits to select company-mode candidates]].
 
+With this mode you can basically use 'C-.' to start a completion, and then use either a digit to select and complete, or go up/down the list of completions use 'C-p' or 'C-n' with '<tab>' to complete.
+
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :bind (("C-." . company-complete)
@@ -865,30 +882,30 @@ Configurations via [[https://oremacs.com/2017/12/27/company-numbers/][Using digi
     :config
     (setq company-show-numbers t
           company-tooltip-align-annotations t)
+    (labels
+        (let ((map company-active-map))
+          (mapc
+           (lambda (x)
+             (define-key map (format "%d" x) 'ora-company-number))
+           (number-sequence 0 9))
+          (define-key map " " (lambda ()
+                                (interactive)
+                                (company-abort)
+                                (self-insert-command 1)))
+          (define-key map (kbd "<return>") nil))
 
-    (let ((map company-active-map))
-      (mapc
-       (lambda (x)
-         (define-key map (format "%d" x) 'ora-company-number))
-       (number-sequence 0 9))
-      (define-key map " " (lambda ()
-                            (interactive)
-                            (company-abort)
-                            (self-insert-command 1)))
-      (define-key map (kbd "<return>") nil))
-
-    (defun ora-company-number ()
-      "Forward to `company-complete-number'.
+      (defun ora-company-number ()
+        "Forward to `company-complete-number'.
 
   Unless the number is potentially part of the candidate.
   In that case, insert the number."
-      (interactive)
-      (let* ((k (this-command-keys))
-             (re (concat "^" company-prefix k)))
-        (if (cl-find-if (lambda (s) (string-match re s))
-                        company-candidates)
-            (self-insert-command 1)
-          (company-complete-number (string-to-number k))))))
+        (interactive)
+        (let* ((k (this-command-keys))
+               (re (concat "^" company-prefix k)))
+          (if (cl-find-if (lambda (s) (string-match re s))
+                          company-candidates)
+              (self-insert-command 1)
+            (company-complete-number (string-to-number k))))))
 #+END_SRC
 ** Jumping (Avy, Ace-Window and Friends)
 *** Jump to Characters and Words
