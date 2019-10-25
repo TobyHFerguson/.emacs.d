@@ -931,8 +931,8 @@ With this mode you can basically use 'C-.' to start a completion, and then use e
     :bind (("C-x o" . ace-window)
            ("M-2" . ace-window))
     :init
-    (setq aw-background nil
-          aw-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
+    (setq aw-background t
+          aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 #+END_SRC
 *** Zapping
 **** Generic Zapping
