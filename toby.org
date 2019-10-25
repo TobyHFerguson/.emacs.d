@@ -2032,6 +2032,16 @@ Exclude completed tasks from refile targets, from [[https://michael.englehorn.co
 
   (setq org-refile-target-verify-function 'bh/verify-refile-target)
 #+END_SRC
+**** Archiving
+   I want my archive files to be stored in a separate subdirectory,
+   =Archive=
+   #+NAME: org-config
+   #+BEGIN_SRC emacs-lisp
+     (setq org-archive-location (expand-file-name
+                                 "%s_archive::"
+                                 (expand-file-name "Archive" org-directory)
+                                   ))
+   #+END_SRC
 **** Speed Commands
 #+BEGIN_SRC emacs-lisp
   (setq org-use-speed-commands t
