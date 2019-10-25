@@ -2242,7 +2242,7 @@ This function creates an agenda of stuck projects that is restricted to my "Proj
 #+BEGIN_SRC emacs-lisp
   (defun go-to-areas ()
       (interactive)
-      (find-file "~/org/todo.org")
+      (find-file "~/org/projects.org")
       (widen)
       (beginning-of-buffer)
       (re-search-forward "* Areas")
