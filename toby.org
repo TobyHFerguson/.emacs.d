@@ -379,6 +379,7 @@ This advises kill-region (C-w) so that, if no region is selected, it kills or co
 ** backward-kill-line
 This binding comes from [[http://emacsredux.com/blog/2013/04/08/kill-line-backward/][Emacs Redux]]. Note that we don't need a new function, just an anonymous function.
 
+This makes 'C-<backspace>' delete from point to the beginning of the line
 #+BEGIN_SRC emacs-lisp
   (bind-key "C-<backspace>" (lambda ()
                               (interactive)
@@ -388,6 +389,7 @@ This binding comes from [[http://emacsredux.com/blog/2013/04/08/kill-line-backwa
 ** Sentence and Paragraph Commands
 By default, sentence-end-double-space is set to t. That convention may be programatically convenient, but that's not how I write. I want to be able to write normal sentences, but still be able to fill normally. Let to the rescue!
 
+This doesn't work. 
 #+BEGIN_SRC emacs-lisp
   (defadvice forward-sentence (around real-forward)
     "Consider a sentence to have one space at the end."
@@ -426,6 +428,7 @@ Augmented by a post on [[http://irreal.org/blog/?p%3D2830][Irreal]]. Some keys o
 **** Narrowing and Widening
 Before this function, I was alternating between C-x n s (org-narrow-to-subtree) and C-x n w (widen) in Org files. I originally implemented this to [[http://endlessparentheses.com/the-toggle-map-and-wizardry.html][toggle]] between those two cases as well as the region. [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][Artur Malabarba and Sacha Chua]] have made successive improvements: a prefix argument to narrow no matter what, and increasing features for Org.
 
+This binds 'C-x t n' so that it will narrow 'intelligently', or widen (a prefix will force narrowing)
 #+BEGIN_SRC emacs-lisp
   (defun narrow-or-widen-dwim (p)
     "If the buffer is narrowed, it widens. Otherwise, it narrows
@@ -578,6 +581,10 @@ I probably need to modify these to cope with my windows AND mac keyboards!
     (set-face-attribute 'default nil :height 155))
 #+END_SRC
 **** Correcting ls
+Need to install brew's coreutils:
+#+begin_src sh
+brew install coreutils
+#+end_src
 #+BEGIN_SRC emacs-lisp
   (when (is-mac-p)
     (setq insert-directory-program "gls"))
