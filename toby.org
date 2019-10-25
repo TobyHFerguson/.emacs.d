@@ -1447,7 +1447,7 @@ brew tap homebrew/cask-fonts && brew cask install font-et-book
     :init
     (setq default-major-mode 'org-mode
           org-directory "~/org/"
-          org-log-done note
+          org-log-done 'note
           org-startup-indented t
           org-startup-truncated nil
           org-startup-with-inline-images t
@@ -1472,7 +1472,7 @@ brew tap homebrew/cask-fonts && brew cask install font-et-book
             ("\\.x?html?\\'" . "firefox %s")
             ("\\.pdf\\'" . "open %s"))
           org-todo-keywords
-          '((sequence "TODO(t)" "STARTED(s)" "WAITING(w)" "SOMEDAY(.)" "MAYBE(m)" "|" "DONE(x!)" "CANCELLED(c)"))
+          '((sequence "TODO(t)" "STARTED(s)" "WAITING(w)" "SOMEDAY(.)" "|" "DONE(d@)" "CANCELLED(c)"))
           ;; Theming
           org-ellipsis "  " ;; folding symbol
           org-pretty-entities t
