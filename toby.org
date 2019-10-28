@@ -1804,7 +1804,10 @@ The first Emacs Lisp that I ever wrote was to configure my capture templates!
 
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "inbox.org" "Inbox")
+        '(
+          ("p" "Project" entry (file+headline "~/org/projects.org" "Projects")
+           (file "~/org/templates/newprojecttemplate.org"))
+           ("t" "Todo" entry (file+headline "inbox.org" "Inbox")
            "* TODO %?:inbox:\nEntered on %U\n  %i\n  %a")
           ("T" "Tickler" entry
            (file+headline "tickler.org" "Tickler")
@@ -2205,6 +2208,7 @@ A project is "any outcome that will take more than one action step to complete."
 
 #+BEGIN_SRC emacs-lisp
   (defun go-to-projects ()
+    "Go to the projects file"
     (interactive)
     (find-file "~/org/projects.org")
     (widen)
@@ -2213,6 +2217,8 @@ A project is "any outcome that will take more than one action step to complete."
     (beginning-of-line))
 
   (defun project-overview ()
+    "Get an overview of all the projects in columnar format, sorted
+  by priority"
     (interactive)
     (go-to-projects)
     (org-narrow-to-subtree)
@@ -2220,6 +2226,8 @@ A project is "any outcome that will take more than one action step to complete."
     (org-columns))
 
   (defun project-deadline-overview ()
+    "Get an overview of all the projects in columnar format, sorted
+  by deadline"
     (interactive)
     (go-to-projects)
     (org-narrow-to-subtree)
@@ -2234,6 +2242,7 @@ Org-Mode has the ability to tell you which subtrees don't have tasks associated 
 This function creates an agenda of stuck projects that is restricted to my "Projects" subtree.
 #+BEGIN_SRC emacs-lisp
   (defun my-org-agenda-list-stuck-projects ()
+    "List any projects that are stuck"
     (interactive)
     (go-to-projects)
     (org-agenda nil "#" 'subtree))
