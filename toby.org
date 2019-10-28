@@ -5,7 +5,7 @@
 This is my version of Tasshin Fogelman's Emacs configuration.
 
 * Laptop Setup
-Ensure you've setup as per https://bitbucket.org/TobyHFerguson/org/src/master/mac_setup.org
+Ensure you've setup as per https://bitbucket.org/TobyHFerguson/org/mac_setup.org
 * Settings
 ** Personal information
 #+BEGIN_SRC emacs-lisp
