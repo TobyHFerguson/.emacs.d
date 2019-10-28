@@ -1672,7 +1672,8 @@ I wanted to be able to add a sort property to files or subtrees and get automati
                                  "~/org/inbox.org"
                                  "~/org/waiting.org"
                                  "~/org/calendar.org"
-                                 "~/org/someday.org")))
+                                 "~/org/someday.org"
+                                 "~/org/tickler.org")))
 #+END_SRC
 ***** Open Org Agenda
 This function opens the agenda in full screen.
