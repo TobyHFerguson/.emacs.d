@@ -2450,3 +2450,11 @@ Via [[https://github.com/hrs/dotfiles][Harry Schwartz]].
     (replace-regexp "^- " "")
     (copy-whole-buffer))
 #+END_SRC
+* Overite Selected Text
+  Make sure that Emacs works like most other programs, where selected
+  text is deleted with a single <DEL>, and overwritten by any entered
+  text.
+
+  #+BEGIN_SRC emacs-lisp
+  (delete-selection-mode)
+  #+END_SRC
