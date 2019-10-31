@@ -878,6 +878,10 @@ Configurations via [[https://oremacs.com/2017/12/27/company-numbers/][Using digi
 
 With this mode you can basically use 'C-.' to start a completion, and then use either a digit to select and complete, or go up/down the list of completions use 'C-p' or 'C-n' with '<tab>' to complete.
 
+
+*** Company Mode
+Configurations via [[https://oremacs.com/2017/12/27/company-numbers/][Using digits to select company-mode candidates]].
+
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :bind (("C-." . company-complete)
@@ -891,30 +895,30 @@ With this mode you can basically use 'C-.' to start a completion, and then use e
     :config
     (setq company-show-numbers t
           company-tooltip-align-annotations t)
-    (labels
-        (let ((map company-active-map))
-          (mapc
-           (lambda (x)
-             (define-key map (format "%d" x) 'ora-company-number))
-           (number-sequence 0 9))
-          (define-key map " " (lambda ()
-                                (interactive)
-                                (company-abort)
-                                (self-insert-command 1)))
-          (define-key map (kbd "<return>") nil))
 
-      (defun ora-company-number ()
-        "Forward to `company-complete-number'.
+    (let ((map company-active-map))
+      (mapc
+       (lambda (x)
+         (define-key map (format "%d" x) 'ora-company-number))
+       (number-sequence 0 9))
+      (define-key map " " (lambda ()
+                            (interactive)
+                            (company-abort)
+                            (self-insert-command 1)))
+      (define-key map (kbd "<return>") nil))
+
+    (defun ora-company-number ()
+      "Forward to `company-complete-number'.
 
   Unless the number is potentially part of the candidate.
   In that case, insert the number."
-        (interactive)
-        (let* ((k (this-command-keys))
-               (re (concat "^" company-prefix k)))
-          (if (cl-find-if (lambda (s) (string-match re s))
-                          company-candidates)
-              (self-insert-command 1)
-            (company-complete-number (string-to-number k))))))
+      (interactive)
+      (let* ((k (this-command-keys))
+             (re (concat "^" company-prefix k)))
+        (if (cl-find-if (lambda (s) (string-match re s))
+                        company-candidates)
+            (self-insert-command 1)
+          (company-complete-number (string-to-number k))))))
 #+END_SRC
 ** Jumping (Avy, Ace-Window and Friends)
 *** Jump to Characters and Words
