@@ -1672,12 +1672,13 @@ I wanted to be able to add a sort property to files or subtrees and get automati
 #+END_SRC
 ***** Agenda Files
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files (quote ("~/org/projects.org"
-                                 "~/org/inbox.org"
-                                 "~/org/waiting.org"
+  (setq org-agenda-files (quote ("~/org/inbox.org"
                                  "~/org/calendar.org"
+                                 "~/org/projects.org"
+                                 "~/org/waiting.org"
                                  "~/org/someday.org"
-                                 "~/org/tickler.org")))
+                                 "~/org/tickler.org"
+                                 )))
 #+END_SRC
 ***** Open Org Agenda
 This function opens the agenda in full screen.
@@ -2026,11 +2027,6 @@ This function comes from [[http://kitchingroup.cheme.cmu.edu/blog/2016/03/18/Org
 #+END_SRC
 
 **** Refiling
-#+BEGIN_SRC emacs-lisp
-  (setq org-refile-targets '((("~/org/projects.org" "~/org/someday.org") :maxlevel . 3))
-        ;; org-refile-use-cache t
-        org-refile-use-outline-path t)
-#+END_SRC
 
 Exclude completed tasks from refile targets, from [[https://michael.englehorn.com/config.html][Michael Englehorn's Emacs Configuration]].
 #+BEGIN_SRC emacs-lisp
@@ -2040,10 +2036,32 @@ Exclude completed tasks from refile targets, from [[https://michael.englehorn.co
 
   (setq org-refile-target-verify-function 'bh/verify-refile-target)
 #+END_SRC
+
+   I want to file and refile notes to any header level 1 - 3, but not to my =inbox= nor to my =calendar=. I also want to allow refiling to the current buffer, up to 5 headings deep.
+
+   #+BEGIN_SRC emacs-lisp
+     (setq org-refile-targets (list (cons (nthcdr 2 org-agenda-files)
+                                          (cons :maxlevel  3))
+                                    (cons nil  (cons :maxlevel  5))
+                                    ))
+   #+END_SRC
+
+   I also want to allow refiling to allow me to create top level
+   targets. I saw this article: [[https://blog.aaronbieber.com/2017/03/19/organizing-notes-with-refile.html][Organizing Notes With Refile]] which
+   explained how:
+
+   #+BEGIN_SRC emacs-lisp
+     (setq org-refile-allow-creating-parent-nodes 'confirm)
+   #+END_SRC
+
+   I want to show an outline path, including the file, when I attempt
+   to refile:
+   #+BEGIN_SRC emacs-lisp
+   (setq org-refile-use-outline-path 'file)
+   #+END_SRC
 **** Archiving
    I want my archive files to be stored in a separate subdirectory,
    =Archive=
-   #+NAME: org-config
    #+BEGIN_SRC emacs-lisp
      (setq org-archive-location (expand-file-name
                                  "%s_archive::"
