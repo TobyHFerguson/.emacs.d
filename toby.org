@@ -1536,6 +1536,9 @@ I use the [[http://orgmode.org/manual/Tracking-your-habits.html][org-habits]] mo
     (org-set-property "STYLE" "habit"))
 #+END_SRC
 **** [[https://github.com/myuhe/org-gcal.el][org-gcal]]
+:PROPERTIES:
+:ID:       1302D43C-775A-4506-9CD8-D70A84475FDA
+:END:
 See also: [[https://cestlaz.github.io/posts/using-emacs-26-gcal/][Using Emacs - 26 - Google Calendar, Org Agenda]]
 #+BEGIN_SRC emacs-lisp
   (use-package org-gcal
@@ -1609,6 +1612,26 @@ I wanted to be able to add a sort property to files or subtrees and get automati
                ("m" . yankpad-map)
                ("r" . yankpad-reload)
                ("x" . yankpad-expand)))
+#+END_SRC
+**** Screencapture
+I could use [[https://github.com/abo-abo/org-download][GitHub - abo-abo/org-download: Drag and drop images to Emacs org-mode]] but I think that's more than I need. [[https://github.com/dfeich/org-screenshot][GitHub - dfeich/org-screenshot: screenshots integrated with emacs org mode at...]] seems like a good starting point.
+
+#+begin_src emacs-lisp
+  (use-package org-attach-screenshot
+    :init
+    (setq org-attach-screenshot-command-line "screencapture -i %f")
+    (setq org-attach-screenshot-dirfunction
+          (lambda () 
+            (progn (assert (buffer-file-name))
+                   (concat (file-name-sans-extension (buffer-file-name))
+                           "_att"))))
+    :bind (:map launcher-map
+                ("4" . org-attach-screenshot)))
+#+end_src
+***** [[https://github.com/abo-abo/org-download][Drag and Drop]] images 
+This is the mechanism I've chosen not to use. Keeping it here just in case!
+#+BEGIN_SRC emacs-lisp
+;(use-package org-download)
 #+END_SRC
 *** Functionality
 **** Agendas
@@ -1902,10 +1925,6 @@ However, there are a *lot* of commands for clocking; this is a perfect instance 
   (bind-keys ("C-c w" . hydra-org-clock/body)
              :map org-agenda-mode-map
              ("C-c w" . hydra-org-agenda-clock/body))
-#+END_SRC
-**** [[https://github.com/abo-abo/org-download][Drag and Drop]] images 
-#+BEGIN_SRC emacs-lisp
-(use-package org-download)
 #+END_SRC
 **** Exporting
 I often want to export Org-Mode documents into other formats. This section contains some defaults and packages that have made that workflow easier for me.
