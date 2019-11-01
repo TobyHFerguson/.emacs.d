@@ -1828,6 +1828,11 @@ Thanks Sacha for this custom code!
 
   (bind-key "`" 'org-agenda-set-tags-auto-advance org-agenda-mode-map)
 #+END_SRC
+***** Include diary
+I pull the diary in from google, and integrate via the diary
+#+begin_src emacs-lisp
+(setq org-agenda-include-diary t)
+#+end_src
 **** Capture Templates
 The first Emacs Lisp that I ever wrote was to configure my capture templates!
 
