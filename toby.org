@@ -1535,21 +1535,19 @@ I use the [[http://orgmode.org/manual/Tracking-your-habits.html][org-habits]] mo
     (interactive)
     (org-set-property "STYLE" "habit"))
 #+END_SRC
-**** [[https://github.com/myuhe/org-gcal.el][org-gcal]]
-:PROPERTIES:
-:ID:       1302D43C-775A-4506-9CD8-D70A84475FDA
-:END:
+**** Google Calendar Integration
+I used to use [[https://github.com/myuhe/org-gcal.el][org-gcal]]l, but this is now broken. I'm instead integrating with the diary.
 See also: [[https://cestlaz.github.io/posts/using-emacs-26-gcal/][Using Emacs - 26 - Google Calendar, Org Agenda]]
 #+BEGIN_SRC emacs-lisp
-  (use-package org-gcal
-    :bind (:map org-agenda-mode-map
-                ;; "r" is bound to org-agenda-redo
-                ("g" . org-gcal-fetch))
-    :init
-    (add-hook 'emacs-startup-hook #'org-gcal-fetch)
+  ;; (use-package org-gcal
+  ;;   :bind (:map org-agenda-mode-map
+  ;;               ;; "r" is bound to org-agenda-redo
+  ;;               ("g" . org-gcal-fetch))
+  ;;   :init
+  ;;   (add-hook 'emacs-startup-hook #'org-gcal-fetch)
 
-    (defun fetch-calendar ()
-      (when (internet-up-p) (org-gcal-fetch))))
+  ;;   (defun fetch-calendar ()
+  ;;     (when (internet-up-p) (org-gcal-fetch))))
 #+END_SRC
 **** org-cliplink
 [[https://melpa.org/#/org-cliplink][org-cliplink]] lets you insert a link from your clipboard with a title that is fetched from the page's metadata.
@@ -1696,7 +1694,6 @@ This is the mechanism I've chosen not to use. Keeping it here just in case!
 ***** Agenda Files
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-files (quote ("~/org/inbox.org"
-                                 "~/org/calendar.org"
                                  "~/org/projects.org"
                                  "~/org/waiting.org"
                                  "~/org/someday.org"
@@ -1780,18 +1777,15 @@ Thanks Sacha for this custom code!
   (defun my-org-agenda-recent-open-loops ()
     (interactive)
     (let ((org-agenda-start-with-log-mode t)
-          (org-agenda-use-time-grid nil)
-          (org-agenda-files '("~/org/calendar.org")))
-      (fetch-calendar)
+          (org-agenda-use-time-grid nil))
       (org-agenda-list nil (org-read-date nil nil "-2d") 4)
       (beginend-org-agenda-mode-goto-beginning)))
 
   (defun my-org-agenda-longer-open-loops ()
     (interactive)
     (let ((org-agenda-start-with-log-mode t)
-          (org-agenda-use-time-grid nil)
-          (org-agenda-files '("~/org/calendar.org")))
-      (fetch-calendar)
+          (org-agenda-use-time-grid nil))
+      ;; (FETCH-calendar)
       (org-agenda-list 'file (org-read-date nil nil "-14d") 28)
       (beginend-org-agenda-mode-goto-beginning)))
 #+END_SRC
@@ -1831,7 +1825,9 @@ Thanks Sacha for this custom code!
 ***** Include diary
 I pull the diary in from google, and integrate via the diary
 #+begin_src emacs-lisp
-(setq org-agenda-include-diary t)
+  (setq org-agenda-include-diary t)
+  (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
+  (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
 #+end_src
 **** Capture Templates
 The first Emacs Lisp that I ever wrote was to configure my capture templates!
@@ -2323,7 +2319,7 @@ This function creates an agenda of stuck projects that is restricted to my "Proj
         (org-capture-finalize t)
         (org-speed-move-safe 'outline-up-heading)
         (org-narrow-to-subtree)
-        (fetch-calendar)
+        ;; (fetch-calendar)
         (org-clock-in))))
 
   (defun my-new-weekly-review ()
@@ -2335,7 +2331,7 @@ This function creates an agenda of stuck projects that is restricted to my "Proj
         (org-capture-finalize t)
         (org-speed-move-safe 'outline-up-heading)
         (org-narrow-to-subtree)
-        (fetch-calendar)
+        ;; (fetch-calendar)
         (org-clock-in))))
 
   (defun my-new-monthly-review ()
@@ -2347,7 +2343,7 @@ This function creates an agenda of stuck projects that is restricted to my "Proj
         (org-capture-finalize t)
         (org-speed-move-safe 'outline-up-heading)
         (org-narrow-to-subtree)
-        (fetch-calendar)
+        ;; (fetch-calendar)
         (org-clock-in))))
 
   (bind-keys :prefix-map review-map
