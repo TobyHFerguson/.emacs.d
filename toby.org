@@ -805,6 +805,7 @@ Recent files keeps track of which files you're using; I access it by rebinding f
           enable-recursive-minibuffers t))
 
   (use-package all-the-icons)
+  (all-the-icons-install-fonts 'no-prompt)
 
   (use-package ivy-rich
     :after ivy
