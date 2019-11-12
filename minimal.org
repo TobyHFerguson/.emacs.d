@@ -1,0 +1,592 @@
+
+* Settings
+** Personal information
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Toby Ferguson"
+        user-mail-address "toby.h.ferguson@gmail.com")
+#+END_SRC
+** Enable Package Support
+I set up packages, Melpa, and use-package bright and early so that I can make use of use-package's bind-key macro.
+
+If I recall correctly, when I first copy this set-up into a new machine, I still have to require package, add MELPA, initialize package, and grab use-package, solarized-theme. This could be improved, but it's not so bad.
+*** Use-Package
+Use-package is a handful of things: you can make sure a package is downloaded, efficiently configure it (e.g. after load, or as needed), bind keys in a concise way, and more.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'package)
+  (setq package-archives
+        '(("gnu" . "https://elpa.gnu.org/packages/")
+          ("melpa" . "https://melpa.org/packages/")))
+  (setq load-prefer-newer t)
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+END_SRC
+*** Async
+Async enables asynchronous processing in Emacs, as well as some basic implementations of asynchronous capabilities (e.g. for dired and packages and so on.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package async
+    :init
+    (autoload 'dired-async-mode "dired-async.el" nil t)
+    (dired-async-mode 1)
+    (async-bytecomp-package-mode 1)
+    (autoload 'dired-async-mode "dired-async.el" nil t)
+    (async-bytecomp-package-mode 1)
+    (dired-async-mode 1)
+    (require 'smtpmail-async)
+    (setq send-mail-function 'async-smtpmail-send-it))
+#+END_SRC
+*** Paradox
+I like Paradox - it is an alternative / extension to the built-in package manager.
+#+BEGIN_SRC emacs-lisp
+  (use-package paradox
+    :config
+    (setq paradox-execute-asynchronously t))
+#+END_SRC
+** Detection
+*** Detect Operating System
+These functions identify what operating system is hosting Emacs, which can be handy for system specific configuration. I have run Emacs on Windows, OS X, Linux, and BSD. I currently use Linux most of the time, and OS X some of the time, so my configuration is geared towards those. Still, I may want to run my configuration on Windows or BSD in the future so I include those functions.
+
+#+BEGIN_SRC emacs-lisp
+  (defun is-mac-p
+      ()
+    (eq system-type 'darwin))
+
+  (defun is-linux-p
+      ()
+    (eq system-type 'gnu/linux))
+
+  (defun is-windows-p
+      ()
+    (or
+     (eq system-type 'ms-dos)
+     (eq system-type 'windows-nt)
+     (eq system-type 'cygwin)))
+
+  (defun is-bsd-p
+      ()
+    (eq system-type 'gnu/kfreebsd))
+#+END_SRC
+**** Detect Internet Connection
+#+BEGIN_SRC emacs-lisp
+  (defun internet-up-p (&optional host)
+    (= 0 (call-process "ping" nil nil nil "-c" "1" "-W" "1"
+                       (if host host "www.google.com"))))
+#+END_SRC
+** Security
+** Backups
+I find Emacs default behavior of saving files relative to the current directory annoying, as it puts backup files everywhere. Instead, this saves backups in one directory, a backup folder within my Emacs directory.
+
+#+BEGIN_SRC emacs-lisp
+  (setq backup-directory-alist
+        `(("." . ,(expand-file-name user-emacs-directory "backups"
+                   ))))
+#+END_SRC
+** Prompts
+*** Yes or No
+Make yes or no prompts be y or n prompts.
+
+#+BEGIN_SRC emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+*** Buffer / File Warnings
+Remove the warning if a buffer or file does not exist, so you can create them. ([[https://iqbalansari.github.io/blog/2014/12/07/automatically-create-parent-directories-on-visiting-a-new-file-in-emacs/][Source]].)
+
+#+BEGIN_SRC emacs-lisp
+  (setq confirm-nonexistent-file-or-buffer nil)
+
+  (defun create-non-existent-directory ()
+    "Check whether a given file's parent directories exist; if they do not, offer to create them."
+    (let ((parent-directory (file-name-directory buffer-file-name)))
+      (when (and (not (file-exists-p parent-directory))
+                 (y-or-n-p (format "Directory `%s' does not exist! Create it?" parent-directory)))
+        (make-directory parent-directory t))))
+
+  (add-to-list 'find-file-not-found-functions #'create-non-existent-directory)
+#+END_SRC
+
+** Other
+*** Macros
+[[https://www.youtube.com/watch?v=67dE1lfDs9k][Think about]] macros! [[http://emacsnyc.org/assets/documents/keyboard-macro-workshop-exercises.zip][Play with]] macros!
+
+#+BEGIN_SRC emacs-lisp
+  (setq kmacro-ring-max 30)
+#+END_SRC
+*** Ediff
+The default Ediff behavior is confusing and not desirable. This fixes it.
+
+#+BEGIN_SRC emacs-lisp
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain
+        ediff-split-window-function 'split-window-horizontally)
+#+END_SRC
+*** Enable functionality
+Some features and settings are disabled by default; this is sane behavior for new users, but it is expected that we will disable them eventually.
+
+#+BEGIN_SRC emacs-lisp
+  (put 'narrow-to-region 'disabled nil)
+  (put 'narrow-to-page 'disabled nil)
+  (put 'upcase-region 'disabled nil)
+  (put 'downcase-region 'disabled nil)
+  (put 'erase-buffer 'disabled nil)
+  (put 'set-goal-column 'disabled nil)
+#+END_SRC
+*** Casing
+The following advice makes the upcase/downcase/capitalize-word functions more usable. Thanks, [[http://oremacs.com/2014/12/23/upcase-word-you-silly/][Oleh]]!
+
+#+BEGIN_SRC emacs-lisp
+  (defadvice upcase-word (before upcase-word-advice activate)
+    (unless (looking-back "\\b" nil)
+      (backward-word)))
+
+  (defadvice downcase-word (before downcase-word-advice activate)
+    (unless (looking-back "\\b" nil)
+      (backward-word)))
+
+  (defadvice capitalize-word (before capitalize-word-advice activate)
+    (unless (looking-back "\\b" nil)
+      (backward-word)))
+#+END_SRC
+
+Also, unbind downcase region, which has plagued my documents for eons.
+
+#+BEGIN_SRC emacs-lisp
+  (unbind-key "C-x C-l")
+#+END_SRC
+* Graphics
+** Theme
+Load spacemacs-light automatically on startup.
+I got this suggestion from https://github.com/nashamri/spacemacs-theme/issues/42
+#+BEGIN_SRC emacs-lisp
+  (use-package spacemacs-common
+      :ensure spacemacs-theme
+      :config (load-theme 'spacemacs-light t))
+#+END_SRC
+** Start initial frame maximized
+From [[https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up][here]]
+#+begin_src emacs-lisp
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+#+end_src
+** Font
+Install the font first, using brew:
+#+BEGIN_SRC sh
+    brew tap homebrew/cask-fonts && brew cask install font-source-code-pro
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (set-default-font "Source Code Pro" nil t)
+  (set-face-attribute 'default nil :height 150)
+#+END_SRC
+** Fringe decorations
+[[http://www.emacswiki.org/emacs/TheFringe][The fringe]] is the vertical region at the right and left of the
+buffer. Emacs lets you customize it of course.
+
+Here I set up git diffs and buffer position in the fringe.
+
+#+BEGIN_SRC emacs-lisp
+     (use-package git-gutter
+       :init (global-git-gutter-mode +1)
+       :config 
+       (setq-default indicate-buffer-boundaries 'left)
+       (setq-default indicate-empty-lines +1))
+#+END_SRC
+** Buffer names
+Setup uniquify so that non-unique buffer names get the parent path
+included to make them unique.
+#+BEGIN_SRC emacs-lisp
+     (use-package uniquify
+       :ensure nil				;See
+                                             ;https://github.com/jwiegley/use-package/issues/320
+                                             ;for explanation
+       :config
+       (setq uniquify-buffer-name-style 'forward))
+#+END_SRC
+** Prettify Symbols
+Make symbols (such as =lambda=) actually show up as the relevant symbol
+#+BEGIN_SRC emacs-lisp
+  (global-prettify-symbols-mode +1)
+#+END_SRC
+** Cursor
+Adaptive cursor width shows width of character, e.g. TAB. Via [[http://pragmaticemacs.com/emacs/adaptive-cursor-width/][Pragmatic Emacs]].
+
+#+BEGIN_SRC emacs-lisp
+(setq x-stretch-cursor t)
+#+END_SRC
+* Behaviour
+** Discoverability
+*** which-key
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :init
+    (which-key-mode))
+#+END_SRC
+*** help-fns+
+#+BEGIN_SRC emacs-lisp
+  (use-package help-fns+
+    :ensure nil
+    :bind ("C-h M-k" . describe-keymap)) ; For autoloading.
+#+END_SRC
+*** discover-my-major
+#+BEGIN_SRC emacs-lisp
+  (use-package discover-my-major
+    :bind ("C-h C-m" . discover-my-major))
+#+END_SRC
+*** Interaction Log
+Interaction Log is like =view-lossage= (=C-h l=) or =kmacro-edit-macro= but it is live-updating and not tied to macros. It's useful for when you type an (awesome? terrible?) Emacs command and want to figure out which function you used so you can use it again or destroy it forever. For a long time I was plagued by accidentally hitting =downcase-region= and didn't know what the function was - this would have been so useful!
+
+#+BEGIN_SRC emacs-lisp
+  (use-package interaction-log)
+
+  (interaction-log-mode +1)
+
+  (defun open-interaction-log ()
+    (interactive)
+    (display-buffer ilog-buffer-name))
+
+  (bind-key "C-h C-l" 'open-interaction-log)
+#+END_SRC
+** Overwrite Selected Text
+  Make sure that Emacs works like most other programs, where selected
+  text is deleted with a single <DEL>, and overwritten by any entered
+  text.
+
+  #+BEGIN_SRC emacs-lisp
+  (delete-selection-mode)
+  #+END_SRC
+** IDO
+#+BEGIN_SRC emacs-lisp
+  (use-package ido
+    :init
+    (setq ido-enable-flex-matching t
+          ido-everywhere t
+          ido-use-faces t ;; disable ido faces to see flx highlights.
+          ido-create-new-buffer 'always
+          ;; suppress  "reference to free variable problems"
+          ido-cur-item nil
+          ido-context-switch-command nil
+          ido-cur-list nil
+          ido-default-item nil))
+
+  (use-package ido-vertical-mode
+    :init
+    (ido-vertical-mode)
+    (setq ido-vertical-define-keys 'C-n-and-C-p-only))
+
+  (use-package flx-ido
+    :init
+    (setq flx-ido-threshold 1000)
+    (flx-ido-mode 1))
+
+  (use-package ido-complete-space-or-hyphen
+    :init
+    (ido-mode t))
+#+END_SRC
+
+** Special Key Maps
+*** [[http://endlessparentheses.com/the-toggle-map-and-wizardry.html][Toggle Map]]
+Augmented by a post on [[http://irreal.org/blog/?p%3D2830][Irreal]]. Some keys on the toggle map are elsewhere in this config.
+**** Narrowing and Widening
+Before this function, I was alternating between C-x n s (org-narrow-to-subtree) and C-x n w (widen) in Org files. I originally implemented this to [[http://endlessparentheses.com/the-toggle-map-and-wizardry.html][toggle]] between those two cases as well as the region. [[http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html][Artur Malabarba and Sacha Chua]] have made successive improvements: a prefix argument to narrow no matter what, and increasing features for Org.
+
+This binds 'C-x t n' so that it will narrow 'intelligently', or widen (a prefix will force narrowing)
+#+BEGIN_SRC emacs-lisp
+  (defun narrow-or-widen-dwim (p)
+    "If the buffer is narrowed, it widens. Otherwise, it narrows
+  intelligently.  Intelligently means: region, org-src-block,
+  org-subtree, or defun, whichever applies first.  Narrowing to
+  org-src-block actually calls `org-edit-src-code'.
+
+  With prefix P, don't widen, just narrow even if buffer is already
+  narrowed."
+    (interactive "P")
+    (declare (interactive-only))
+    (cond ((and (buffer-narrowed-p) (not p)) (widen))
+          ((and (boundp 'org-src-mode) org-src-mode (not p))
+           (org-edit-src-exit))
+          ((region-active-p)
+           (narrow-to-region (region-beginning) (region-end)))
+          ((derived-mode-p 'org-mode)
+           (cond ((ignore-errors (org-edit-src-code))
+                  (delete-other-windows))
+                 ((org-at-block-p)
+                  (org-narrow-to-block))
+                 (t (org-narrow-to-subtree))))
+          ((derived-mode-p 'prog-mode) (narrow-to-defun))
+          (t (error "Please select a region to narrow to"))))
+
+  (eval-after-load 'org-src
+    '(bind-key "C-x C-s" 'org-edit-src-exit org-src-mode-map))
+#+END_SRC
+**** Cold Folding
+For code folding, which is similar to narrowing and widening but different.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package hideshow
+    :hook ((prog-mode . hs-minor-mode)))
+
+  (defun toggle-fold ()
+    (interactive)
+    (save-excursion
+      (end-of-line)
+      (hs-toggle-hiding)))
+#+END_SRC
+**** Toggle Read Only
+A lot of modes let you change from read-only to writeable, or backwards: files, Dired, and also wgrep-enabled modes. I use [[https://github.com/ggreer/the_silver_searcher][ag, the silver searcher]], instead of grep or ack. Anyways, this function decides which mode I am in and acts accordingly. That way, I need to remember just one key bind, C-x t r.
+
+#+BEGIN_SRC emacs-lisp
+  (defun read-write-toggle ()
+    "Toggles read-only in any relevant mode: ag-mode, Dired, or
+  just any file at all."
+    (interactive)
+    (if (equal major-mode 'ag-mode)
+        ;; wgrep-ag can support ag-mode
+        (wgrep-change-to-wgrep-mode)
+      ;; dired-toggle-read-only has its own conditional:
+      ;; if the mode is Dired, it will make the directory writable
+      ;; if it is not, it will just toggle read only, as desired
+      (dired-toggle-read-only)))
+#+END_SRC
+**** Keymap
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :prefix-map toggle-map
+             :prefix "C-x t"
+             ("d" . toggle-debug-on-error)
+             ("f" . toggle-fold)
+             ("l" . linum-mode)
+             ("n" . narrow-or-widen-dwim)
+             ("o" . org-mode)
+             ("r" . read-write-toggle)
+             ("t" . text-mode)
+             ("w" . whitespace-mode))
+#+END_SRC
+*** [[http://endlessparentheses.com/launcher-keymap-for-standalone-features.html][Launcher Map]]
+**** Scratch
+#+BEGIN_SRC emacs-lisp
+  (defun scratch ()
+      (interactive)
+      (switch-to-buffer-other-window (get-buffer-create "*scratch*")))
+#+END_SRC
+
+The default scratch buffer in Emacs uses =lisp-interaction-mode=, which is great, but it's useful to have one that uses Org-Mode.
+
+#+BEGIN_SRC emacs-lisp
+  (defun make-org-scratch ()
+    (interactive)
+    (find-file "~/org/scratch.org"))
+#+END_SRC
+**** Keymap
+
+
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :prefix-map launcher-map
+             :prefix "C-x l"
+             ("A" . ansi-term) ;; save "a" for open-agenda
+             ("c" . calc)
+             ("C" . calendar)
+             ("d" . ediff-buffers)
+             ("e" . eshell)
+             ("E" . eww)
+             ("h" . man)
+             ("l" . paradox-list-packages)
+             ("u" . paradox-upgrade-packages)
+             ("p l" . paradox-list-packages)
+             ("p u" . paradox-upgrade-packages)
+             ("P" . proced)
+             ("s" . scratch)
+             ("S" . make-org-scratch))
+
+  (when (is-linux-p)
+    (bind-keys :map launcher-map
+               ("." . counsel-linux-app)))
+
+  (when (is-mac-p)
+    (use-package counsel-osx-app
+      :bind (:map launcher-map
+                  ("." . counsel-osx-app))))
+
+  (use-package counsel-osx-app)
+#+END_SRC
+*** Macro Map
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :prefix-map macro-map
+             :prefix "C-c m"
+             ("a" . kmacro-add-counter)
+             ("b" . kmacro-bind-to-key)
+             ("e" . kmacro-edit-macro)
+             ("i" . kmacro-insert-counter)
+             ("I" . insert-kbd-macro)
+             ("K" . kmacro-end-or-call-macro-repeat)
+             ("n" . kmacro-cycle-ring-next)
+             ("N" . kmacro-name-last-macro)
+             ("p" . kmacro-cycle-ring-previous)
+             ("r" . apply-macro-to-region-lines)
+             ("c" . kmacro-set-counter)
+             ("s" . kmacro-start-macro)
+             ("t" . kmacro-end-or-call-macro))
+#+END_SRC
+* Programming and Development
+** Development Tools
+*** Magit
+#+begin_src emacs-lisp
+(use-package magit
+:init
+    (global-set-key "\C-cg" 'magit-status)
+    (setq magit-default-tracking-name-function #'magit-default-tracking-name-branch-only)
+)
+#+end_src
+** Language Support
+*** Lua
+#+begin_src emacs-lisp
+  (use-package lua-mode
+    :init
+    (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+    (add-to-list 'interpreter-mode-alist '("lua" . lua-mode)))
+#+end_src
+*** Python
+#+begin_src emacs-lisp
+  (use-package blacken)
+  (use-package elpy
+    :ensure t
+    :defer t
+    :init
+    (advice-add 'python-mode :before 'elpy-enable)
+    :config
+    (when (require 'flycheck nil t)
+      (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+      (add-hook 'elpy-mode-hook 'flycheck-mode))
+    (setq elpy-test-pytest-runner-command  '("pytest"))
+    (setq elpy-test-runner 'elpy-test-pytest-runner)
+    )
+#+end_src
+* Org Mode
+** Configuration
+I use the stock package of org-mode as the default major mode.
+
+The theming for Org-Mode is derived from [[https://lepisma.github.io/2017/10/28/ricing-org-mode/][Ricing up Org Mode]] with help from folks on [[https://www.reddit.com/r/emacs/comments/9m22lw/ricing_org_mode_with_spacemacs/][Reddit]]. 
+
+Download fonts thus:
+#+BEGIN_SRC sh
+brew tap homebrew/cask-fonts && brew cask install font-et-book
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :bind (("C-c l" . org-store-link)
+           ("C-c c" . org-capture)
+           ("C-c a" . org-agenda)
+           ("C-c b" . org-iswitchb)
+           ("C-c M-k" . org-cut-subtree)
+           ("<down>" . org-insert-todo-heading)
+           :map org-mode-map
+           ("C-c >" . org-time-stamp-inactive))
+    :custom-face
+    (variable-pitch ((t (:family "ETBembo"))))
+    (org-document-title ((t (:foreground "#171717" :weight bold :height 1.5))))
+    (org-done ((t (:background "#E8E8E8" :foreground "#0E0E0E" :strike-through t :weight bold))))
+    (org-headline-done ((t (:foreground "#171717" :strike-through t))))
+    (org-level-1 ((t (:foreground "#090909" :weight bold :height 1.3))))
+    (org-level-2 ((t (:foreground "#090909" :weight normal :height 1.2))))
+    (org-level-3 ((t (:foreground "#090909" :weight normal :height 1.1))))
+    (org-image-actual-width '(600))
+    :init
+    (setq default-major-mode 'org-mode
+          org-directory "~/org/"
+          org-log-done 'note
+          org-startup-indented t
+          org-startup-truncated nil
+          org-startup-with-inline-images t
+          org-completion-use-ido t
+          org-default-notes-file (concat org-directory "notes.org")
+          org-image-actual-width '(300)
+          org-goto-max-level 10
+          org-imenu-depth 5
+          org-goto-interface 'outline-path-completion
+          org-outline-path-complete-in-steps nil
+          org-src-fontify-natively t
+          org-lowest-priority ?C
+          org-default-priority ?B
+          org-expiry-inactive-timestamps t
+          org-show-notification-handler 'message
+          org-special-ctrl-a/e t
+          org-special-ctrl-k t
+          org-yank-adjusted-subtrees t
+          org-file-apps
+          '((auto-mode . emacs)
+            ("\\.mm\\'" . default)
+            ("\\.x?html?\\'" . "firefox %s")
+            ("\\.pdf\\'" . "open %s"))
+          org-todo-keywords
+          '((sequence "TODO(t)" "STARTED(s)" "WAITING(w)" "SOMEDAY(.)" "|" "DONE(d@)" "CANCELLED(c)"))
+          ;; Theming
+          org-ellipsis "  " ;; folding symbol
+          org-pretty-entities t
+          org-hide-emphasis-markers t ;; show actually italicized text instead of /italicized text/
+          org-agenda-block-separator ""
+          org-fontify-whole-heading-line t
+          org-fontify-done-headline t
+          org-fontify-quote-and-verse-blocks t
+          ;; These settings ensure that items SCHEDULED in the future are not shown
+          ;; until that date
+          org-agenda-todo-ignore-scheduled 'future
+          org-agenda-tags-todo-honor-ignore-options t
+          )
+
+    (add-to-list 'org-global-properties
+                 '("Effort_ALL". "0:05 0:15 0:30 1:00 2:00 3:00 4:00"))
+
+    (add-hook 'org-mode-hook
+              '(lambda ()
+                 (setq line-spacing 0.2) ;; Add more line padding for readability
+                 (variable-pitch-mode 1) ;; All fonts with variable pitch.
+                 (mapc
+                  (lambda (face) ;; Other fonts with fixed-pitch.
+                    (set-face-attribute face nil :inherit 'fixed-pitch))
+                  (list 'org-code
+                        'org-link
+                        'org-block
+                        'org-table
+                        'org-verbatim
+                        'org-block-begin-line
+                        'org-block-end-line
+                        'org-meta-line
+                        'org-document-info-keyword))))
+
+    (custom-theme-set-faces
+     'spacemacs-light
+     `(org-block-begin-line ((t (:background "#fbf8ef"))))
+     `(org-block-end-line ((t (:background "#fbf8ef"))))))
+#+END_SRC
+** org-cliplink
+[[https://melpa.org/#/org-cliplink][org-cliplink]] lets you insert a link from your clipboard with a title that is fetched from the page's metadata.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-cliplink
+    :bind ("C-x p i" . org-cliplink))
+#+END_SRC
+** [[https://github.com/sabof/org-bullets][org-bullets]]
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :init
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+END_SRC
+** Screencapture
+I could use [[https://github.com/abo-abo/org-download][GitHub - abo-abo/org-download: Drag and drop images to Emacs org-mode]] but I think that's more than I need. [[https://github.com/dfeich/org-screenshot][GitHub - dfeich/org-screenshot: screenshots integrated with emacs org mode at...]] seems like a good starting point.
+
+#+begin_src emacs-lisp
+  (use-package org-attach-screenshot
+    :init
+    (setq org-attach-screenshot-command-line "screencapture -i %f")
+    (setq org-attach-screenshot-dirfunction
+          (lambda () 
+            (progn (assert (buffer-file-name))
+                   (concat (file-name-sans-extension (buffer-file-name))
+                           "_att"))))
+    :bind (:map launcher-map
+                ("4" . org-attach-screenshot)))
+#+end_src
+*** [[https://github.com/abo-abo/org-download][Drag and Drop]] images 
+This is the mechanism I've chosen not to use. Keeping it here just in case!
+#+BEGIN_SRC emacs-lisp
+;(use-package org-download)
+#+END_SRC
