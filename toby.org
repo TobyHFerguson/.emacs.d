@@ -83,8 +83,8 @@ These functions identify what operating system is hosting Emacs, which can be ha
     (= 0 (call-process "ping" nil nil nil "-c" "1" "-W" "1"
                        (if host host "www.google.com"))))
 #+END_SRC
-*** Graphical Features
-**** Theme
+** Graphical Features
+*** Theme
 Load spacemacs-light automatically on startup.
 I got this suggestion from https://github.com/nashamri/spacemacs-theme/issues/42
 #+BEGIN_SRC emacs-lisp
@@ -92,7 +92,7 @@ I got this suggestion from https://github.com/nashamri/spacemacs-theme/issues/42
       :ensure spacemacs-theme
       :config (load-theme 'spacemacs-light t))
 #+END_SRC
-**** Start initial frame maximized
+*** Start initial frame maximized
 From [[https://emacs.stackexchange.com/questions/2999/how-to-maximize-my-emacs-frame-on-start-up][here]]
 #+begin_src emacs-lisp
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
