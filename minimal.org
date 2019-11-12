@@ -425,6 +425,29 @@ The default scratch buffer in Emacs uses =lisp-interaction-mode=, which is great
              ("s" . kmacro-start-macro)
              ("t" . kmacro-end-or-call-macro))
 #+END_SRC
+** Shells
+*** Shell Mode
+If on mac install bash thus:
+#+BEGIN_SRC sh
+    brew install bash
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package shell
+    :bind (:map shell-mode-map
+                ("<s-up>" . comint-previous-input)
+                ("<s-down>" . comint-next-input))
+    :init
+    (dirtrack-mode)
+    (setq explicit-shell-file-name (cond ((is-linux-p) "/bin/bash")
+                                         ((is-mac-p) "/usr/local/bin/bash")))
+    (when (is-mac-p)
+      (use-package exec-path-from-shell
+        :init
+        (exec-path-from-shell-initialize))))
+
+  (add-hook 'after-save-hook
+            'executable-make-buffer-file-executable-if-script-p)
+#+END_SRC
 * Programming and Development
 ** Development Tools
 *** Magit
