@@ -1419,6 +1419,30 @@ See Magnars' tutorial on [[http://emacsrocks.com/e15.html][Emacs Rocks]].
 #+BEGIN_SRC emacs-lisp
   (use-package restclient)
 #+END_SRC
+** Language Support
+*** Lua
+#+begin_src emacs-lisp
+  (use-package lua-mode
+    :init
+    (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+    (add-to-list 'interpreter-mode-alist '("lua" . lua-mode)))
+#+end_src
+*** Python
+#+begin_src emacs-lisp
+  (use-package blacken)
+  (use-package elpy
+    :ensure t
+    :defer t
+    :init
+    (advice-add 'python-mode :before 'elpy-enable)
+    :config
+    (when (require 'flycheck nil t)
+      (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+      (add-hook 'elpy-mode-hook 'flycheck-mode))
+    (setq elpy-test-pytest-runner-command  '("pytest"))
+    (setq elpy-test-runner 'elpy-test-pytest-runner)
+    )
+#+end_src
 * Words and Numbers
 ** Writing (Org Mode)
 *** Configuration
