@@ -146,9 +146,9 @@ Adaptive cursor width shows width of character, e.g. TAB. Via [[http://pragmatic
 *** Turn off unnecessary graphical features
 **** Tool Bar
 #+BEGIN_SRC emacs-lisp
-  (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+  ;; (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
   (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-  (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+  ;; (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 #+END_SRC
 **** Startup Messages
 #+BEGIN_SRC emacs-lisp
