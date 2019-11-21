@@ -1414,12 +1414,11 @@ Projectile configuration adapted from [[http://endlessparentheses.com/improving-
       "Go back to project selection."
       (projectile-switch-project)))
 #+END_SRC
-*** Style Checking (Checkdoc with Flycheck)
-Flycheck presents a handsome and usable interface for [[http://endlessparentheses.com/Checkdoc%25252C-Package-Developing%25252C-and-Cakes.html][checkdoc]], amongst other things.
+*** Style Checking
+Style checking is enabled using [[https://www.flycheck.org/en/latest/index.html][flycheck]]. Use =C-c ! v= to run ~flycheck-verify-setup~
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :init
-    (use-package flycheck-clojure)
     (global-flycheck-mode)
     (setq flycheck-indication-mode 'right-fringe))
 #+END_SRC
@@ -1437,8 +1436,26 @@ See Magnars' tutorial on [[http://emacsrocks.com/e15.html][Emacs Rocks]].
     (add-to-list 'interpreter-mode-alist '("lua" . lua-mode)))
 #+end_src
 *** Python
+As text is being typed it is being checked using flycheck which uses flake8 under the covers, via python-flake8. The style is enforced on save using [[https://github.com/paetzke/py-autopep8.el][py-autopep8]] to link to autopep8
+
+Both syntax checking and style checking are initiated using ~C-c C-v~ using pylint
+
+The configuration files are:
+- flake8 ::  file+emacs:~/.flake8rc
+- pylint :: file+emacs:~/.pylintrc
+
+flake8 error messages look like this: =unexpected indentation[E113]=. To remove this warning add the following to the flake8rc file: 
+#+begin_example
+ignore = E113
+#+end_example
+See the [[https://flake8.readthedocs.io/en/latest/user/configuration.html][Configuring Flake8]] page for details.
+
+pylint messages look like this:
+#+begin_example
+ (E0001, syntax-error, ) unindent does not match any outer indentation level (<unknown>, line 14)
+#+end_example
+To remove this warning add the ~syntax-error~ to the ~disable~ property of the pylintrc file. See the [[http://pylint.pycqa.org/en/stable/][pylint user manual]] for more details
 #+begin_src emacs-lisp
-  (use-package blacken)
   (use-package elpy
     :ensure t
     :defer t
@@ -1450,6 +1467,9 @@ See Magnars' tutorial on [[http://emacsrocks.com/e15.html][Emacs Rocks]].
       (add-hook 'elpy-mode-hook 'flycheck-mode))
     (setq elpy-test-pytest-runner-command  '("python" "-m" "pytest"))
     (setq elpy-test-runner 'elpy-test-pytest-runner)
+    (use-package py-autopep8
+      :init
+      (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save))
     )
 #+end_src
 * Words and Numbers
