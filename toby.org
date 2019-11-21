@@ -419,10 +419,17 @@ A slightly less tricky matter is the default binding of backward- and forward-pa
              ("M-K" . kill-paragraph))
 #+END_SRC
 ** Cycle Spacing
+Cycle spacing will cycle through spaces thus:
+1 space -> no spaces -> back to start
 #+BEGIN_SRC emacs-lisp
 (bind-key "C-x SPC" 'cycle-spacing)
 #+END_SRC
 ** Special Key Maps
+| Map          | Purpose         | Keybinding |
+|--------------+-----------------+------------|
+| toggle-map   | toggle settings | ~C-x t~      |
+| launcher-map | Launch stuff    | ~C-x l~      |
+|              |                 |            |
 *** [[http://endlessparentheses.com/the-toggle-map-and-wizardry.html][Toggle Map]]
 Augmented by a post on [[http://irreal.org/blog/?p%3D2830][Irreal]]. Some keys on the toggle map are elsewhere in this config.
 **** Narrowing and Widening
@@ -761,7 +768,13 @@ This replaces Golden Ratio mode.
 #+END_SRC
 
 ** Completion (Ivy, Counsel, and Swiper; IDO and Smex)
-I prefer Ivy, Counsel, and Swiper, but I keep [[http://www.masteringemacs.org/articles/2010/10/10/introduction-to-ido-mode/][IDO]] around for Smex (in particular =smex-major-mode-commands=).
+[[Ivy]] provides sophisticated completion support, and is generally tied in to finding files
+[[https://github.com/abo-abo/swiper][Swiper]] is an alternative to isearch that uses ivy to show an overview of all matches.
+[[https://github.com/abo-abo/swiper][Counsel]] provides extensions to command Emacs commands to make best use of ivy
+
+All three packages are from the same authoer
+
+I prefer [[https://oremacs.com/swiper/][Ivy]] , Counsel, and Swiper, but I keep [[http://www.masteringemacs.org/articles/2010/10/10/introduction-to-ido-mode/][IDO]] around for Smex (in particular =smex-major-mode-commands=).
 *** Counsel
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
@@ -878,10 +891,6 @@ Smex (Smart M-X) implements IDO functionality for the M-X window.
 Configurations via [[https://oremacs.com/2017/12/27/company-numbers/][Using digits to select company-mode candidates]].
 
 With this mode you can basically use 'C-.' to start a completion, and then use either a digit to select and complete, or go up/down the list of completions use 'C-p' or 'C-n' with '<tab>' to complete.
-
-
-*** Company Mode
-Configurations via [[https://oremacs.com/2017/12/27/company-numbers/][Using digits to select company-mode candidates]].
 
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -1439,7 +1448,7 @@ See Magnars' tutorial on [[http://emacsrocks.com/e15.html][Emacs Rocks]].
     (when (require 'flycheck nil t)
       (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
       (add-hook 'elpy-mode-hook 'flycheck-mode))
-    (setq elpy-test-pytest-runner-command  '("pytest"))
+    (setq elpy-test-pytest-runner-command  '("python" "-m" "pytest"))
     (setq elpy-test-runner 'elpy-test-pytest-runner)
     )
 #+end_src

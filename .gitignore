@@ -1,0 +1,17 @@
+/.org-id-locations
+/.places
+/autosave/
+/bookmarks
+/elpa/
+/elpy/
+/emacs_backup/
+/emojis/
+/ido.last
+/minimal.el
+/projectile-bookmarks.eld
+/projectile.cache
+/recentf
+/smex-items
+/toby.el
+/transient/
+/url/
