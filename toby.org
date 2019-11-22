@@ -851,41 +851,42 @@ Recent files keeps track of which files you're using; I access it by rebinding f
 
 #+END_SRC
 *** IDO
+I haven't figured out why I'd want IDO, nor why I'd want smex. Commenting these out for now ...
 #+BEGIN_SRC emacs-lisp
-  (setq ido-enable-flex-matching t
-        ido-everywhere t
-        ido-use-faces t ;; disable ido faces to see flx highlights.
-        ido-create-new-buffer 'always
-        ;; suppress  "reference to free variable problems"
-        ido-cur-item nil
-        ido-context-switch-command nil
-        ido-cur-list nil
-        ido-default-item nil)
+  ;; (setq ido-enable-flex-matching t
+  ;;       ido-everywhere t
+  ;;       ido-use-faces t ;; disable ido faces to see flx highlights.
+  ;;       ido-create-new-buffer 'always
+  ;;       ;; suppress  "reference to free variable problems"
+  ;;       ido-cur-item nil
+  ;;       ido-context-switch-command nil
+  ;;       ido-cur-list nil
+  ;;       ido-default-item nil)
 
-  (use-package ido-vertical-mode
-    :init
-    (ido-vertical-mode)
-    (setq ido-vertical-define-keys 'C-n-and-C-p-only))
+  ;; (use-package ido-vertical-mode
+  ;;   :init
+  ;;   (ido-vertical-mode)
+  ;;   (setq ido-vertical-define-keys 'C-n-and-C-p-only))
 
-  (use-package flx-ido
-    :init
-    (setq flx-ido-threshold 1000)
-    (flx-ido-mode 1))
+  ;; (use-package flx-ido
+  ;;   :init
+  ;;   (setq flx-ido-threshold 1000)
+  ;;   (flx-ido-mode 1))
 
-  (use-package ido-complete-space-or-hyphen
-    :init
-    (ido-mode t))
+  ;; (use-package ido-complete-space-or-hyphen
+  ;;   :init
+  ;;   (ido-mode t))
 #+END_SRC
 **** Smex
 Smex (Smart M-X) implements IDO functionality for the M-X window.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package smex
-    :bind (("C-x M-m" . smex-major-mode-commands)
-           ("M-x" . smex-major-mode-commands)
-           ("C-c C-c M-x" . execute-extended-command))
-    :init
-    (smex-initialize))
+  ;; (use-package smex
+  ;;   :bind (("C-x M-m" . smex-major-mode-commands)
+  ;;          ("M-x" . smex-major-mode-commands)
+  ;;          ("C-c C-c M-x" . execute-extended-command))
+  ;;   :init
+  ;;   (smex-initialize))
 #+END_SRC
 *** Company Mode
 Configurations via [[https://oremacs.com/2017/12/27/company-numbers/][Using digits to select company-mode candidates]].
