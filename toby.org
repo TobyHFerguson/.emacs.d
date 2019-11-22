@@ -851,7 +851,18 @@ Recent files keeps track of which files you're using; I access it by rebinding f
 
 #+END_SRC
 *** IDO
-I haven't figured out why I'd want IDO, nor why I'd want smex. Commenting these out for now ...
+I seem to need ido - if I don't have it then sometimes I get an ivy error like this if I visit the file+emacs:~/.emacs.d/diary
+#+begin_example
+Preparing diary...done
+Preparing diary...done
+Preparing diary...done
+Preparing diary...done
+Preparing diary...done
+Preparing diary...done
+Preparing diary...done
+Quit
+Error in post-command-hook (ivy--queue-exhibit): (wrong-type-argument stringp diary-mode)
+#+end_example
 #+BEGIN_SRC emacs-lisp
   ;; (setq ido-enable-flex-matching t
   ;;       ido-everywhere t
