@@ -1921,32 +1921,32 @@ The first Emacs Lisp that I ever wrote was to configure my capture templates!
     )
   (setq org-capture-templates
         '(
-          ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-          ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
-          ("f" "Film" entry (file+headline "~/org/films.org" "Films")
-           (file "templates/filmtemplate.org"))
           ("b" "Book" entry (file+headline "~/org/books.org" "Books")
            (file "templates/booktemplate.org"))
-          ("P" "Project" entry (file+headline "projects.org" "Projects")
-           (file "templates/newprojecttemplate.org"))
-          ("t" "Todo" entry (file+headline "inbox.org" "Inbox")
-           "* TODO %?:inbox:\nEntered on %U\n  %i\n  %a")
-          ("T" "Tickler" entry
-           (file+headline "tickler.org" "Tickler")
-           "* %i%? \n %U")
+          ("f" "Film" entry (file+headline "~/org/films.org" "Films")
+           (file "templates/filmtemplate.org"))
           ("j" "Journal" entry (file+datetree "journal.org")
            "* [%<%R>] %?\nEntered on %U\n  %i\n  %a")
-          ("w" "org-protocol" entry (file "refile.org")
-           "* TODO Review %a\n%U\n%:initial\n" :immediate-finish t)
           ("l" "A link, for reading later." entry
            (file+headline "notes.org" "Reading List")
            "* %:annotation\n%U\n\n%i"
            :empty-lines 1)
+          ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+          ("t" "Todo" entry (file+headline "inbox.org" "Inbox")
+           "* TODO %?:inbox:\nEntered on %U\n  %i\n  %a")
+          ("w" "org-protocol" entry (file "refile.org")
+           "* TODO Review %a\n%U\n%:initial\n" :immediate-finish t)
           ("D"  "My day plan" plain (file+datetree "dayplan.org")
            (file "dayplan.txt")
-           :immediate-finish t)))
+           :immediate-finish t)
+          ("L" "Protocol Link" entry (file+headline "notes.org" "Inbox")
+           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")        ("P" "Project" entry (file+headline "projects.org" "Projects")
+           (file "templates/newprojecttemplate.org"))
+          ("T" "Tickler" entry
+           (file+headline "tickler.org" "Tickler")
+           "* %i%? \n %U")
+          ))
 
   (setq org-protocol-default-template-key "w")
 
