@@ -1519,7 +1519,7 @@ brew tap homebrew/cask-fonts && brew cask install font-et-book
     (org-image-actual-width '(600))
     :init
     (setq default-major-mode 'org-mode
-          org-directory "~/org/"
+          org-directory "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org"
           org-log-done 'note
           org-startup-indented t
           org-startup-truncated nil
@@ -1585,6 +1585,17 @@ brew tap homebrew/cask-fonts && brew cask install font-et-book
      `(org-block-begin-line ((t (:background "#fbf8ef"))))
      `(org-block-end-line ((t (:background "#fbf8ef"))))))
 #+END_SRC
+**** Remote Capture
+I'm trying to use the remote capture system from [[https://github.com/sprig/org-capture-extension][GitHub - sprig/org-capture-extension: A Chrome and firefox extension facilita...]]
+
+I installed emacsclient using brew:
+#+begin_src sh
+brew cask install emacsclient 
+#+end_src
+And then installed the [[https://chrome.google.com/webstore/detail/org-capture/kkkjlfejijcjgjllecmnejhogpbcigdc][chrome extension]]
+
+Finally I have to configure two templates, which default to 'L' (for the link) and 'p'
+
 *** Packages
 **** org-modules
 I removed =org-tempo= in favor of the more modern 'C-c C-,' way of expanding =org-structure-template-alist=
@@ -1762,12 +1773,7 @@ This is the mechanism I've chosen not to use. Keeping it here just in case!
 #+END_SRC
 ***** Agenda Files
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files (quote ("~/org/inbox.org"
-                                 "~/org/projects.org"
-                                 "~/org/waiting.org"
-                                 "~/org/someday.org"
-                                 "~/org/tickler.org"
-                                 )))
+  (setq org-agenda-files (expand-file-name "org-agenda-files" org-directory))
 #+END_SRC
 ***** Open Org Agenda
 This function opens the agenda in full screen.
@@ -1902,12 +1908,23 @@ I pull the diary in from google, and integrate via the diary
 The first Emacs Lisp that I ever wrote was to configure my capture templates!
 
 #+BEGIN_SRC emacs-lisp
+  (defun transform-square-brackets-to-round-ones(string-to-transform)
+    "Transforms [ into ( and ] into ), other chars left unchanged."
+    (concat
+     (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform))
+    )
   (setq org-capture-templates
         '(
+          ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+          ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
           ("f" "Film" entry (file+headline "~/org/films.org" "Films")
-           (file "~/org/templates/filmtemplate.org"))
-          ("p" "Project" entry (file+headline "~/org/projects.org" "Projects")
-           (file "~/org/templates/newprojecttemplate.org"))
+           (file "templates/filmtemplate.org"))
+          ("b" "Book" entry (file+headline "~/org/books.org" "Books")
+           (file "templates/booktemplate.org"))
+          ("P" "Project" entry (file+headline "~/org/projects.org" "Projects")
+           (file "templates/newprojecttemplate.org"))
           ("t" "Todo" entry (file+headline "inbox.org" "Inbox")
            "* TODO %?:inbox:\nEntered on %U\n  %i\n  %a")
           ("T" "Tickler" entry
@@ -2382,7 +2399,7 @@ This function creates an agenda of stuck projects that is restricted to my "Proj
   (defun my-new-daily-review ()
     (interactive)
     (let ((org-capture-templates '(("d" "Review: Daily Review" entry (file+olp+datetree "/tmp/reviews.org")
-                                    (file "~/org/templates/dailyreviewtemplate.org")))))
+                                    (file (expand-file-name "templates/dailyreviewtemplate.org" org-directory))))))
       (progn
         (org-capture nil "d")
         (org-capture-finalize t)
@@ -2394,7 +2411,7 @@ This function creates an agenda of stuck projects that is restricted to my "Proj
   (defun my-new-weekly-review ()
     (interactive)
     (let ((org-capture-templates '(("w" "Review: Weekly Review" entry (file+olp+datetree "/tmp/reviews.org")
-                                    (file "~/org/templates/weeklyreviewtemplate.org")))))
+                                    (file (expand-file-name "templates/weeklyreviewtemplate.org" org-directory))))))
       (progn
         (org-capture nil "w")
         (org-capture-finalize t)
@@ -2406,7 +2423,7 @@ This function creates an agenda of stuck projects that is restricted to my "Proj
   (defun my-new-monthly-review ()
     (interactive)
     (let ((org-capture-templates '(("m" "Review: Monthly Review" entry (file+olp+datetree "/tmp/reviews.org")
-                                    (file "~/org/templates/monthlyreviewtemplate.org")))))
+                                    (file (expand-file-name "templates/monthlyreviewtemplate.org" org-directory))))))
       (progn
         (org-capture nil "m")
         (org-capture-finalize t)
