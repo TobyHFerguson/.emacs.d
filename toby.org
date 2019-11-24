@@ -103,7 +103,7 @@ Install the font first, using brew:
     brew tap homebrew/cask-fonts && brew cask install font-source-code-pro
 #+END_SRC
 #+BEGIN_SRC emacs-lisp
-  (set-default-font "Source Code Pro" nil t)
+  (set-frame-font "Source Code Pro" nil t)
   (set-face-attribute 'default nil :height 150)
 #+END_SRC
 
@@ -1681,7 +1681,7 @@ I wanted to be able to add a sort property to files or subtrees and get automati
 
   (use-package yankpad
     :init
-    (setq yankpad-file "~/org/templates/yankpad.org")
+    (setq yankpad-file (expand-file-name "templates/yankpad.org" org-directory))
     (bind-keys :prefix-map yank-map
                :prefix "C-c y"
                ("c" . yankpad-set-category)
@@ -1773,7 +1773,13 @@ This is the mechanism I've chosen not to use. Keeping it here just in case!
 #+END_SRC
 ***** Agenda Files
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files (expand-file-name "org-agenda-files" org-directory))
+  (setq org-agenda-files (mapcar '(lambda (f) (expand-file-name f org-directory))
+                              '("inbox.org"
+                               "projects.org"
+                               "waiting.org"
+                               "someday.org"
+                               "tickler.org"
+                               )))
 #+END_SRC
 ***** Open Org Agenda
 This function opens the agenda in full screen.
@@ -1923,7 +1929,7 @@ The first Emacs Lisp that I ever wrote was to configure my capture templates!
            (file "templates/filmtemplate.org"))
           ("b" "Book" entry (file+headline "~/org/books.org" "Books")
            (file "templates/booktemplate.org"))
-          ("P" "Project" entry (file+headline "~/org/projects.org" "Projects")
+          ((expand-file-name "P" org-directory) "Project" entry (file+headline (expand-file-name "projects.org" org-directory) "Projects")
            (file "templates/newprojecttemplate.org"))
           ("t" "Todo" entry (file+headline "inbox.org" "Inbox")
            "* TODO %?:inbox:\nEntered on %U\n  %i\n  %a")
@@ -2243,7 +2249,7 @@ This has changed in org-mode 9.2
 #+BEGIN_SRC emacs-lisp
   (defun open-todo-file ()
     (interactive)
-    (find-file "~/org/projects.org"))
+    (find-file (expand-file-name "projects.org" org-directory)))
 
   (bind-key "C-c t" 'open-todo-file)
 #+END_SRC
@@ -2341,7 +2347,7 @@ A project is "any outcome that will take more than one action step to complete."
   (defun go-to-projects ()
     "Go to the projects file"
     (interactive)
-    (find-file "~/org/projects.org")
+    (find-file (expand-file-name "projects.org" org-directory))
     (widen)
     (beginning-of-buffer)
     (re-search-forward "* Projects")
@@ -2382,7 +2388,7 @@ This function creates an agenda of stuck projects that is restricted to my "Proj
 #+BEGIN_SRC emacs-lisp
   (defun go-to-areas ()
       (interactive)
-      (find-file "~/org/projects.org")
+      (find-file (expand-file-name ("projects.org") org-directory))
       (widen)
       (beginning-of-buffer)
       (re-search-forward "* Areas")
