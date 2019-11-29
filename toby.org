@@ -1941,7 +1941,8 @@ The first Emacs Lisp that I ever wrote was to configure my capture templates!
            (file "dayplan.txt")
            :immediate-finish t)
           ("L" "Protocol Link" entry (file+headline "notes.org" "Inbox")
-           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")        ("P" "Project" entry (file+headline "projects.org" "Projects")
+           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
+           ("P" "Project" entry (file+headline "projects.org" "Projects")
            (file "templates/newprojecttemplate.org"))
           ("T" "Tickler" entry
            (file+headline "tickler.org" "Tickler")
