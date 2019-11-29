@@ -5,7 +5,7 @@
 This is my version of Tasshin Fogelman's Emacs configuration.
 
 * Laptop Setup
-Ensure you've setup as per https://bitbucket.org/TobyHFerguson/org/mac_setup.org
+Ensure you've setup as per [[https://bitbucket.org/TobyHFerguson/org/src/master/mac_setup.org]]
 * Settings
 ** Personal information
 #+BEGIN_SRC emacs-lisp
@@ -2596,7 +2596,7 @@ Via [[https://github.com/hrs/dotfiles][Harry Schwartz]].
     (replace-regexp "^- " "")
     (copy-whole-buffer))
 #+END_SRC
-* Overite Selected Text
+* Overwrite Selected Text
   Make sure that Emacs works like most other programs, where selected
   text is deleted with a single <DEL>, and overwritten by any entered
   text.
@@ -2604,3 +2604,22 @@ Via [[https://github.com/hrs/dotfiles][Harry Schwartz]].
   #+BEGIN_SRC emacs-lisp
   (delete-selection-mode)
   #+END_SRC
+* Linkify Selected Text
+Convert selected text to a link, using the URL in the cut buffer
+#+begin_src emacs-lisp
+  (defun linkify-text (b e)
+    "Convert highlighted region to link using first value in kill buffer"
+    (interactive "r")
+    (let ((url (current-kill 0)))
+      (save-restriction
+        (narrow-to-region b e)
+        (goto-char (point-min))
+        (insert "[[")
+        (insert url)
+        (insert "][")
+        (goto-char (point-max))
+        (insert "]]"))))
+
+  (local-set-key (kbd "C-c k") 'linkify-text)
+
+#+end_src
