@@ -1558,6 +1558,7 @@ brew tap homebrew/cask-fonts && brew cask install font-et-book
           ;; until that date
           org-agenda-todo-ignore-scheduled 'future
           org-agenda-tags-todo-honor-ignore-options t
+          org-use-sub-superscripts '{}	;I use underscore a lot - force org to require brackets!
           )
 
     (add-to-list 'org-global-properties
