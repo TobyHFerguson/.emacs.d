@@ -1516,7 +1516,7 @@ brew tap homebrew/cask-fonts && brew cask install font-et-book
     (org-level-1 ((t (:foreground "#090909" :weight bold :height 1.3))))
     (org-level-2 ((t (:foreground "#090909" :weight normal :height 1.2))))
     (org-level-3 ((t (:foreground "#090909" :weight normal :height 1.1))))
-    (org-image-actual-width '(600))
+    (org-image-actual-width (/ (display-pixel-width) 3))
     :init
     (setq default-major-mode 'org-mode
           org-directory "~/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org"
@@ -1526,7 +1526,7 @@ brew tap homebrew/cask-fonts && brew cask install font-et-book
           org-startup-with-inline-images t
           org-completion-use-ido t
           org-default-notes-file (concat org-directory "notes.org")
-          org-image-actual-width '(300)
+          org-image-actual-width (/ (display-pixel-width) 3)
           org-goto-max-level 10
           org-imenu-depth 5
           org-goto-interface 'outline-path-completion
@@ -1692,8 +1692,8 @@ I wanted to be able to add a sort property to files or subtrees and get automati
                ("x" . yankpad-expand)))
 #+END_SRC
 **** Screencapture
-I could use [[https://github.com/abo-abo/org-download][GitHub - abo-abo/org-download: Drag and drop images to Emacs org-mode]] but I think that's more than I need. [[https://github.com/dfeich/org-screenshot][GitHub - dfeich/org-screenshot: screenshots integrated with emacs org mode at...]] seems like a good starting point.
-
+***** [[https://github.com/dfeich/org-screenshot][org-screenshot]]
+org-screenshot provides a way to capture the screen ("C-x l 4") and to store that in a file associated with the current's file name  with ~_att~ appended.
 #+begin_src emacs-lisp
   (use-package org-attach-screenshot
     :init
@@ -1707,7 +1707,7 @@ I could use [[https://github.com/abo-abo/org-download][GitHub - abo-abo/org-down
                 ("4" . org-attach-screenshot)))
 #+end_src
 ***** [[https://github.com/abo-abo/org-download][Drag and Drop]] images 
-This is the mechanism I've chosen not to use. Keeping it here just in case!
+I decided this was more complicated than  I needed, but decided to keep this here for future reference
 #+BEGIN_SRC emacs-lisp
 ;(use-package org-download)
 #+END_SRC
