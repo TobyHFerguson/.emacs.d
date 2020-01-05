@@ -1558,6 +1558,7 @@ brew tap homebrew/cask-fonts && brew cask install font-et-book
           ;; until that date
           org-agenda-todo-ignore-scheduled 'future
           org-agenda-tags-todo-honor-ignore-options t
+          org-use-sub-superscripts '{}	;I use underscore a lot - force org to require brackets!
           )
 
     (add-to-list 'org-global-properties
@@ -1616,7 +1617,7 @@ I use the [[http://orgmode.org/manual/Tracking-your-habits.html][org-habits]] mo
     (org-set-property "STYLE" "habit"))
 #+END_SRC
 **** Google Calendar Integration
-I used to use [[https://github.com/myuhe/org-gcal.el][org-gcal]]l, but this is now broken. I'm instead integrating with the diary.
+I used to use [[https://github.com/myuhe/org-gcal.el][org-gcal]], but this is now broken. I'm instead integrating with the diary.
 See also: [[https://cestlaz.github.io/posts/using-emacs-26-gcal/][Using Emacs - 26 - Google Calendar, Org Agenda]]
 #+BEGIN_SRC emacs-lisp
   ;; (use-package org-gcal
@@ -1910,6 +1911,12 @@ I pull the diary in from google, and integrate via the diary
   (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
   (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
 #+end_src
+Diary events are processed using a bunch of functions as per:  [[file+emacs:/Applications/Emacs.app/Contents/Resources/lisp/calendar/icalendar.el.gz::(defcustom icalendar-import-format][icalendar-import-format]]
+In particular I can limit the input to only the summary thus:
+#+begin_src emacs-lisp
+(setq icalendar-import-format "%s")
+#+end_src
+I use this in my helper script file+emacs:~/bin/get_google_calendar.sh
 **** Capture Templates
 The first Emacs Lisp that I ever wrote was to configure my capture templates!
 
@@ -1941,7 +1948,8 @@ The first Emacs Lisp that I ever wrote was to configure my capture templates!
            (file "dayplan.txt")
            :immediate-finish t)
           ("L" "Protocol Link" entry (file+headline "notes.org" "Inbox")
-           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")        ("P" "Project" entry (file+headline "projects.org" "Projects")
+           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
+           ("P" "Project" entry (file+headline "projects.org" "Projects")
            (file "templates/newprojecttemplate.org"))
           ("T" "Tickler" entry
            (file+headline "tickler.org" "Tickler")
